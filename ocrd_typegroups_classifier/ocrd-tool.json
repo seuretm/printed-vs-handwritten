@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "git_url": "https://github.com/seuretm/ocrd_typegroups_classifier",
+  "tools": {
+    "ocrd-typegroups-classifier": {
+      "executable": "ocrd-typegroups-classifier",
+      "description": "Classification of 15th century type groups",
+      "categories": [
+        "Text recognition and optimization"
+      ],
+      "steps": [
+        "recognition/font-identification"
+      ],
+      "parameters": {
+        "network": {
+          "description": "The file name of the neural network to use, including sufficient path information",
+          "type": "string",
+          "required": true
+        },
+        "stride": {
+          "description": "Stride applied to the CNN on the image. Should be between 1 and 224. Smaller values increase the computation time.",
+          "type": "number",
+          "format": "integer",
+          "default": 112
+        }
+      }
+    }
+  }
+}

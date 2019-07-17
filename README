@@ -1,0 +1,22 @@
+System for classifying segmented text lines as printed or handwritten.
+The provided neural network has been trained on:
+* a private dataset for handwritten text lines
+  + 9577 training lines
+  + 1562 validation lines
+* a dataset of printed text which will be released before August 2019
+  + its address will be added here - if not, please send a reminder
+  + 40459 training lines
+  + 1562 test lines
+The accuracy of the classifier on the validation data is 97.47%.
+
+If you intend to use it, it is highly advised that you train it on your
+own data. To do so, create the following folders:
+  lines/training/handwritten
+  lines/training/printed
+  lines/validation/handwritten
+  lines/validation/printed
+and place your line images in these folders. Train the model by
+running train-model.py, and evaluate it with evaluate-model.py.
+
+Usage example:
+python3 classify.py 616.jpg

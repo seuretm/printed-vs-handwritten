@@ -1,0 +1,49 @@
+#!/bin/bash
+set -eu
+# set -x
+
+which ocrd >/dev/null 2>/dev/null || { echo "ocrd not in \$PATH. Panicking"; exit 1; }
+
+SHAREDIR="/dev/null"
+BINDIR="/dev/null"
+
+# The doc indicates that the type group identification data must go in a PAGE file,
+# therefore the image inputs might have to be removed.
+declare -A mimetype2extension=(
+    ['image/tiff']='.tiff'
+    ['image/jp2']='.jp2'
+    ['image/jpg']='.jpg'
+    ['image/png']='.png'
+    ['application/vnd.prima.page+xml']='.xml'
+)
+
+main() {
+    source $( ocrd bashlib filename )
+    
+    ls "$SHAREDIR/ocrd-tool.json"
+    ocrd__wrap "$SHAREDIR/ocrd-tool.json" "ocrd_typegroups_classifier" "$@"
+
+    ocrd ocrd-tool "$SHAREDIR/ocrd-tool.json" tool ocrd_typegroups_classifier parse-params -p "${ocrd__argv[parameter]}"
+    
+    cd "${ocrd__argv[working_dir]}"
+    echo 'Entering loop'
+    ocrd workspace find              \
+        -G "${ocrd__argv[input_file_grp]}" \
+        -k local_filename            \
+        -k ID                        \
+        -k mimetype                  \
+        --download                   \
+    | while read -r csv;do
+        # Parse comma separated fields
+        local IFS=$'\t'
+        local fields=($csv)
+
+        local in_fpath="${fields[0]}"
+        local in_id="${fields[1]}"        
+        local in_mimetype="${fields[2]}"
+        
+        echo "Image to process: $in_fpath"
+        python3 "$SHAREDIR/ocrd_typegroups_classifier.py" "${params[network]}" "$in_fpath" "${params[stride]}"
+    done
+}
+main "$@"
